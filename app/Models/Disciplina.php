@@ -5,8 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use \Illuminate\Database\Eloquent\SoftDeletes;
 
-class Disciplina extends Model
-{
+use OwenIt\Auditing\Contracts\Auditable;	// Linha Adicionada
+use OwenIt\Auditing\Auditable as AuditableTrait; // Linha Adicionada
+
+class Disciplina extends Model implements Auditable { // Linha Alterada
+  
+    use AuditableTrait;		// Linha Adicionada
     use SoftDeletes;
 
     protected $fillable = [

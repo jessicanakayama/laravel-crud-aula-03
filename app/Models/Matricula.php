@@ -4,8 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Matricula extends Model
-{
+use OwenIt\Auditing\Contracts\Auditable;	// Linha Adicionada
+use OwenIt\Auditing\Auditable as AuditableTrait; // Linha Adicionada
+
+class Matricula extends Model implements Auditable { // Linha Alterada
+  
+    use AuditableTrait;		// Linha Adicionada
     protected $fillable = [
         'disciplina_id',
         'aluno_id',

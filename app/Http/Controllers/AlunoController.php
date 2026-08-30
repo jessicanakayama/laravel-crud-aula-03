@@ -2,63 +2,88 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Aluno;
+use App\Http\Requests\AlunoRequest;
+use App\Services\AlunoService;
+use Illuminate\Support\Facades\Gate;
 
-class AlunoController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class AlunoController extends Controller {
+
+    public function __construct(
+        protected AlunoService $service
+    ) {}
+
+    public function index() {
+        Gate::authorize('viewAny', Aluno::class);
+
+        $data = $this->service->all([], [], 'nome');
+
+        return view('aluno.index', compact(['data']));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function create() {
+        Gate::authorize('create', Aluno::class);
+
+        return view('aluno.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function store(AlunoRequest $request) {
+        Gate::authorize('create', Aluno::class);
+
+        $this->service->store($request->validated());
+
+        return redirect()->route('aluno.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+    public function show(string $id) {
+        $aluno = $this->service->find($id);
+
+        Gate::authorize('view', $aluno);
+
+        if(isset($aluno)) {
+            return view('aluno.show', compact(['aluno']));
+        }
+
+        return "<h1>Aluno não encontrado!</h1>";
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+    public function edit(string $id) {
+        $aluno = $this->service->find($id);
+
+        Gate::authorize('update', $aluno);
+
+        if(isset($aluno)) {
+            return view('aluno.edit', compact(['aluno']));
+        }
+
+        return "<h1>Aluno não encontrado!</h1>";
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(AlunoRequest $request, string $id) {
+        $aluno = $this->service->find($id);
+
+        Gate::authorize('update', $aluno);
+
+        if(isset($aluno)) {
+            $this->service->update($request->validated(), $id);
+
+            return redirect()->route('aluno.index');
+        }
+
+        return "<h1>Aluno não encontrado!</h1>";
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(string $id) {
+        $aluno = $this->service->find($id);
+
+        Gate::authorize('delete', $aluno);
+
+        if(isset($aluno)) {
+            $this->service->remove($id);
+
+            return redirect()->route('aluno.index');
+        }
+
+        return "<h1>Aluno não encontrado!</h1>";
     }
 }

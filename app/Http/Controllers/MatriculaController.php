@@ -2,63 +2,108 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Matricula;
+use App\Http\Requests\MatriculaRequest;
+use App\Services\MatriculaService;
+use App\Services\AlunoService;
+use App\Services\CursoService;
+use Illuminate\Support\Facades\Gate;
 
-class MatriculaController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class MatriculaController extends Controller {
+
+    public function __construct(
+        protected MatriculaService $service,
+        protected AlunoService $alunoService,
+        protected CursoService $cursoService
+    ) {}
+
+    public function index() {
+        Gate::authorize('viewAny', Matricula::class);
+
+        $data = $this->service->all(
+            ['aluno', 'curso'],
+            [],
+            'id'
+        );
+
+        return view('matricula.index', compact(['data']));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function create() {
+        Gate::authorize('create', Matricula::class);
+
+        $alunos = $this->alunoService->all([], [], 'nome');
+        $cursos = $this->cursoService->all([], [], 'nome');
+
+        return view('matricula.create', compact(['alunos', 'cursos']));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function store(MatriculaRequest $request) {
+        Gate::authorize('create', Matricula::class);
+
+        $this->service->store($request->validated());
+
+        return redirect()->route('matricula.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+    public function show(string $id) {
+        $matricula = $this->service->find($id, ['aluno', 'curso']);
+
+        Gate::authorize('view', $matricula);
+
+        if(isset($matricula)) {
+            return view('matricula.show', compact(['matricula']));
+        }
+
+        return "<h1>Matrícula não encontrada!</h1>";
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+    public function edit(string $id) {
+        $matricula = $this->service->find($id, ['aluno', 'curso']);
+
+        Gate::authorize('update', $matricula);
+
+        $alunos = $this->alunoService->all([], [], 'nome');
+        $cursos = $this->cursoService->all([], [], 'nome');
+
+        if(isset($matricula)) {
+            return view(
+                'matricula.edit',
+                compact(['matricula', 'alunos', 'cursos'])
+            );
+        }
+
+        return "<h1>Matrícula não encontrada!</h1>";
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
+    public function update(MatriculaRequest $request, string $id) {
+        $matricula = $this->service->find($id);
+
+        Gate::authorize('update', $matricula);
+
+        if(isset($matricula)) {
+            $this->service->update(
+                $request->validated(),
+                $id
+            );
+
+            return redirect()->route('matricula.index');
+        }
+
+        return "<h1>Matrícula não encontrada!</h1>";
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+    public function destroy(string $id) {
+        $matricula = $this->service->find($id);
+
+        Gate::authorize('delete', $matricula);
+
+        if(isset($matricula)) {
+            $this->service->remove($id);
+
+            return redirect()->route('matricula.index');
+        }
+
+        return "<h1>Matrícula não encontrada!</h1>";
     }
 }
