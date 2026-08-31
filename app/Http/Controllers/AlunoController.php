@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\Curso;
 use App\Http\Requests\AlunoRequest;
 use App\Services\AlunoService;
 use Illuminate\Support\Facades\Gate;
@@ -16,15 +17,17 @@ class AlunoController extends Controller {
     public function index() {
         Gate::authorize('viewAny', Aluno::class);
 
-        $data = $this->service->all([], [], 'nome');
+        $data = $this->service->all(['curso'], [], 'nome');
 
-        return view('aluno.index', compact(['data']));
+        return view('aluno.index', compact('data'));
     }
 
     public function create() {
         Gate::authorize('create', Aluno::class);
 
-        return view('aluno.create');
+        $cursos = Curso::orderBy('nome')->get();
+
+        return view('aluno.create', compact('cursos'));
     }
 
     public function store(AlunoRequest $request) {
@@ -36,24 +39,26 @@ class AlunoController extends Controller {
     }
 
     public function show(string $id) {
-        $aluno = $this->service->find($id);
+        $aluno = $this->service->find($id, ['curso']);
 
         Gate::authorize('view', $aluno);
 
         if(isset($aluno)) {
-            return view('aluno.show', compact(['aluno']));
+            return view('aluno.show', compact('aluno'));
         }
 
         return "<h1>Aluno não encontrado!</h1>";
     }
 
     public function edit(string $id) {
-        $aluno = $this->service->find($id);
+        $aluno = $this->service->find($id, ['curso']);
 
         Gate::authorize('update', $aluno);
 
         if(isset($aluno)) {
-            return view('aluno.edit', compact(['aluno']));
+            $cursos = Curso::orderBy('nome')->get();
+
+            return view('aluno.edit', compact('aluno', 'cursos'));
         }
 
         return "<h1>Aluno não encontrado!</h1>";

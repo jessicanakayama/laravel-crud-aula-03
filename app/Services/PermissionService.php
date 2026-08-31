@@ -25,11 +25,12 @@ class PermissionService extends BaseService {
     }
 
     public function isAuthorized($resource) {
-        $permissions = session('user_permissions');
+        $permissions = session('user_permissions', []);
 
-        if(array_key_exists($resource, $permissions)) {
+        if (array_key_exists($resource, $permissions)) {
             return true;
         }
+
         return false;
     }
 }

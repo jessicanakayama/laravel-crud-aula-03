@@ -24,7 +24,6 @@ class AlunoPolicy {
 
     public function update(User $user, Aluno $aluno): bool {
         return $this->service->isAuthorized('aluno.edit');
-S
     }
 
     public function delete(User $user, Aluno $aluno): bool {
