@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\DisciplinaController;
+use App\Http\Controllers\AlunoController;
+use App\Http\Controllers\MatriculaController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])
