@@ -19,4 +19,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('cursos', CursoController::class);
     // Disciplinas
     Route::apiResource('disciplinas', DisciplinaController::class);
+    // Alunos
+    Route::apiResource('alunos', AlunoController::class);
+    // Matriculas
+    Route::apiResource('matriculas', MatriculaController::class);
 });
