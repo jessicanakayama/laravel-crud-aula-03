@@ -26,7 +26,8 @@ class MatriculaController extends Controller {
             'id'
         );
 
-        return view('matricula.index', compact(['data']));
+        if (request()->is('api/*')) return response()->json($data);
+        return view('matricula.index', compact('data'));
     }
 
     public function create() {
@@ -35,14 +36,22 @@ class MatriculaController extends Controller {
         $alunos = $this->alunoService->all([], [], 'nome');
         $cursos = $this->cursoService->all([], [], 'nome');
 
-        return view('matricula.create', compact(['alunos', 'cursos']));
+        if (request()->is('api/*')) {
+            return response()->json([
+                'alunos' => $alunos,
+                'cursos' => $cursos
+            ]);
+        }
+
+        return view('matricula.create', compact('alunos', 'cursos'));
     }
 
     public function store(MatriculaRequest $request) {
         Gate::authorize('create', Matricula::class);
 
-        $this->service->store($request->validated());
+        $matricula = $this->service->store($request->validated());
 
+        if (request()->is('api/*')) return response()->json($matricula, 201);
         return redirect()->route('matricula.index');
     }
 
@@ -52,7 +61,8 @@ class MatriculaController extends Controller {
         Gate::authorize('view', $matricula);
 
         if(isset($matricula)) {
-            return view('matricula.show', compact(['matricula']));
+            if (request()->is('api/*')) return response()->json($matricula);
+            return view('matricula.show', compact('matricula'));
         }
 
         return "<h1>Matrícula não encontrada!</h1>";
@@ -63,14 +73,19 @@ class MatriculaController extends Controller {
 
         Gate::authorize('update', $matricula);
 
-        $alunos = $this->alunoService->all([], [], 'nome');
-        $cursos = $this->cursoService->all([], [], 'nome');
-
         if(isset($matricula)) {
-            return view(
-                'matricula.edit',
-                compact(['matricula', 'alunos', 'cursos'])
-            );
+            $alunos = $this->alunoService->all([], [], 'nome');
+            $cursos = $this->cursoService->all([], [], 'nome');
+
+            if (request()->is('api/*')) {
+                return response()->json([
+                    'matricula' => $matricula,
+                    'alunos' => $alunos,
+                    'cursos' => $cursos
+                ]);
+            }
+
+            return view('matricula.edit', compact('matricula', 'alunos', 'cursos'));
         }
 
         return "<h1>Matrícula não encontrada!</h1>";
@@ -82,10 +97,9 @@ class MatriculaController extends Controller {
         Gate::authorize('update', $matricula);
 
         if(isset($matricula)) {
-            $this->service->update(
-                $request->validated(),
-                $id
-            );
+            $updated = $this->service->update($request->validated(), $id);
+
+            if (request()->is('api/*')) return response()->json($updated);
 
             return redirect()->route('matricula.index');
         }
@@ -100,6 +114,12 @@ class MatriculaController extends Controller {
 
         if(isset($matricula)) {
             $this->service->remove($id);
+
+            if (request()->is('api/*')) {
+                return response()->json([
+                    'message' => 'Matrícula removida com sucesso.'
+                ]);
+            }
 
             return redirect()->route('matricula.index');
         }
