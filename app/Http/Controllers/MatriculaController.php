@@ -8,22 +8,23 @@ use App\Services\MatriculaService;
 use App\Services\AlunoService;
 use App\Services\CursoService;
 use Illuminate\Support\Facades\Gate;
+use App\Services\DisciplinaService;
 
 class MatriculaController extends Controller {
 
     public function __construct(
         protected MatriculaService $service,
         protected AlunoService $alunoService,
-        protected CursoService $cursoService
+        protected DisciplinaService $disciplinaService
     ) {}
 
     public function index() {
         Gate::authorize('viewAny', Matricula::class);
 
         $data = $this->service->all(
-            ['aluno', 'curso'],
+            ['aluno', 'disciplina'],
             [],
-            'id'
+            'aluno_id'
         );
 
         if (request()->is('api/*')) return response()->json($data);
@@ -34,7 +35,7 @@ class MatriculaController extends Controller {
         Gate::authorize('create', Matricula::class);
 
         $alunos = $this->alunoService->all([], [], 'nome');
-        $cursos = $this->cursoService->all([], [], 'nome');
+        $disciplinas = $this->disciplinaService->all([], [], 'nome');
 
         if (request()->is('api/*')) {
             return response()->json([
@@ -43,7 +44,7 @@ class MatriculaController extends Controller {
             ]);
         }
 
-        return view('matricula.create', compact('alunos', 'cursos'));
+        return view('matricula.create', compact('alunos', 'disciplinas'));
     }
 
     public function store(MatriculaRequest $request) {

@@ -1,4 +1,3 @@
-// Passamos o Usuário Logado para o método isAuthorized()
 <?php
 
 namespace App\Policies;

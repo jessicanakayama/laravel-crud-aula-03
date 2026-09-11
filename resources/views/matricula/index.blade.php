@@ -33,7 +33,7 @@
                     </td>
 
                     <td class="d-none d-md-table-cell">
-                        {{ $item->created_at->format('d/m/Y') }}
+                        {{ $item->created_at ? $item->created_at->format('d/m/Y') : '-' }}
                     </td>
 
                     <td>
