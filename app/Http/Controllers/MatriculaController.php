@@ -127,4 +127,16 @@ class MatriculaController extends Controller {
 
         return "<h1>Matrícula não encontrada!</h1>";
     }
+
+
+    public function audit(string $disciplina_id, string $aluno_id)
+{
+    $data = $this->service->auditMatricula(
+        $disciplina_id,
+        $aluno_id
+    );
+
+    return view('matricula.audit', compact('data'));
+}
+
 }
