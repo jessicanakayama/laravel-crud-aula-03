@@ -25,6 +25,7 @@ class PermissionSeeder extends Seeder
             ["role_id" => 1, "resource_id" => 13],
             ["role_id" => 1, "resource_id" => 14],
             // PROFESSOR - MATRICULA
+            ["role_id" => 1, "resource_id" => 16],
             ["role_id" => 1, "resource_id" => 17],
             //  COORDENADOR - CURSO
             ["role_id" => 2, "resource_id" => 1],
@@ -42,6 +43,7 @@ class PermissionSeeder extends Seeder
             ["role_id" => 2, "resource_id" => 11],
             ["role_id" => 2, "resource_id" => 13],
             // COORDENADOR - MATRICULA
+            ["role_id" => 2, "resource_id" => 16],
             ["role_id" => 2, "resource_id" => 17],
             ["role_id" => 2, "resource_id" => 20],
         ];
